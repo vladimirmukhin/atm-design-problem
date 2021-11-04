@@ -9,3 +9,6 @@ class Atm:
         self.cash-=amount
 
         return amount
+
+    def accept(self, amount):
+        self.cash+=amount

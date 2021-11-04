@@ -44,11 +44,15 @@ class MyPrompt(Cmd):
             self.atm.dispense(int(arg))
 
 
-    def do_deposit(self, subcommand):
+    def do_deposit(self, arg):
         '''Adds value to the authorized account.'''
 
         if not self.account_id:
             print("Authentication required")
+
+        self.atm.accept(int(arg))
+
+        self.account_list[self.account_id].deposit(int(arg))
 
 
     def do_balance(self, subcommand):

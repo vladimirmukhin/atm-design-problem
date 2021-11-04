@@ -22,6 +22,9 @@ class Account:
             print("Your account is overdrawn! You may not make withdrawals at this time.")
             return False
 
+    def deposit(self,amount):
+        self.balance+=amount
+
 
 class AccountList:
     def __init__(self):
