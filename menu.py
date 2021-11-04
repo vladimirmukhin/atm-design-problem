@@ -48,6 +48,9 @@ class MyPrompt(Cmd):
 
         if not self.account_id:
             print("Authentication required")
+            return
+
+        print(self.account_list[self.account_id]["BALANCE"])
 
 
     def do_history(self, subcommand):
