@@ -1,11 +1,12 @@
 from cmd import Cmd
 from account import AccountList
-
+from atm import Atm
 
 class MyPrompt(Cmd):
     def preloop(self):
         self.account_list = AccountList().accounts
         self.account_id = None
+        self.atm = Atm()
 
     def do_auth(self, arg):
         '''Authenticates an account locally until they are logged out.'''
@@ -20,7 +21,7 @@ class MyPrompt(Cmd):
             print("Authentication failed.")
             return
 
-        if arg[1] != self.account_list[arg[0]]["PIN"]:
+        if arg[1] != self.account_list[arg[0]].pin:
             print("Authentication failed.")
             return
 
@@ -29,11 +30,18 @@ class MyPrompt(Cmd):
         return
 
 
-    def do_withdraw(self, subcommand):
+    def do_withdraw(self, arg):
         '''Removes value from the authorized account.'''
 
         if not self.account_id:
             print("Authentication required")
+
+        if int(arg) % 20 != 0:
+            print("Withdrawal amount must be a multiple of 20.")
+            return
+
+        if self.account_list[self.account_id].withdraw(int(arg)):
+            self.atm.dispense(int(arg))
 
 
     def do_deposit(self, subcommand):
@@ -50,7 +58,7 @@ class MyPrompt(Cmd):
             print("Authentication required")
             return
 
-        print(self.account_list[self.account_id]["BALANCE"])
+        print(self.account_list[self.account_id].balance)
 
 
     def do_history(self, subcommand):

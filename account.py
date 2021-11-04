@@ -4,7 +4,24 @@ class Account:
     def __init__(self, id, pin, balance):
         self.id = id
         self.pin = pin
-        self.balance = balance
+        self.balance = float(balance)
+
+    def withdraw(self, amount):
+        if self.balance > 0:
+            overdraft = ""
+            if self.balance - amount < 0:
+                overdraft = "You have been charged an overdraft fee of $5. "
+                self.balance-=5
+            self.balance-=amount
+
+            print(f"Amount dispensed: ${amount}")
+            print(f"{overdraft}Current balance: {self.balance}")
+
+            return True
+        else:
+            print("Your account is overdrawn! You may not make withdrawals at this time.")
+            return False
+
 
 class AccountList:
     def __init__(self):
@@ -13,4 +30,4 @@ class AccountList:
         f = open('data/accounts.csv')
         csv = DictReader(f)
         for record in csv:
-            self.accounts[record["ACCOUNT_ID"]] = {"PIN": record["PIN"], "BALANCE": record["BALANCE"]}
+            self.accounts[record["ACCOUNT_ID"]] = Account(record["ACCOUNT_ID"],record["PIN"],record["BALANCE"])
