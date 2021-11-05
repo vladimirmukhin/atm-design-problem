@@ -1,6 +1,7 @@
 from cmd import Cmd
 from account import AccountList
 from atm import Atm
+from os import listdir
 
 class MyPrompt(Cmd):
     def preloop(self):
@@ -70,7 +71,15 @@ class MyPrompt(Cmd):
 
         if not self.account_id:
             print("Authentication required")
+            return
 
+        existing_accounts = listdir('data/account_history')
+        if self.account_id in existing_accounts:
+            history = open(f"data/account_history/{self.account_id}").readlines()
+            for i in range(len(history)-1,-1,-1):
+                print(history[i][:-1])
+        else:
+            print("No history found")
 
     def do_logout(self, subcommand):
         '''Deactivates the currently authenticated account.'''
