@@ -9,25 +9,35 @@ class MyPrompt(Cmd):
         self.account_id = None
         self.atm = Atm()
 
+
     def do_auth(self, arg):
         '''Authenticates an account locally until they are logged out.'''
 
         arg = arg.split()
 
         if len(arg) != 2:
-            print("Authentication failed.")
+            print(f"auth requires exactly 2 arguments, {len(arg)} were given")
             return
 
-        if arg[0] not in self.account_list:
-            print("Authentication failed.")
+        try:
+            int(arg[0])
+            int(arg[1])
+            account_id = arg[0]
+            pin = arg[1]
+        except ValueError:
+            print(f"auth requires numeric arguments")
             return
 
-        if arg[1] != self.account_list[arg[0]].pin:
-            print("Authentication failed.")
+        if account_id not in self.account_list:
+            print("Authentication faileda.")
             return
 
-        print(f"{arg[0]} successfully authenticated")
-        self.account_id = arg[0]
+        if pin != self.account_list[account_id].pin:
+            print("Authentication failedb.")
+            return
+
+        print(f"{account_id} successfully authenticated")
+        self.account_id = account_id
         return
 
 
@@ -37,12 +47,24 @@ class MyPrompt(Cmd):
         if not self.account_id:
             print("Authentication required")
 
-        if int(arg) % 20 != 0:
+        arg = arg.split()
+
+        if len(arg) != 1:
+            print(f"withdraw requires exactly 1 argument, {len(arg)} were given")
+            return
+
+        try:
+            value = int(arg[0])
+        except ValueError:
+            print(f"withdraw requires numeric arguments")
+            return
+
+        if int(value) % 20 != 0:
             print("Withdrawal amount must be a multiple of 20.")
             return
 
-        if self.account_list[self.account_id].withdraw(int(arg)):
-            self.atm.dispense(int(arg))
+        if self.account_list[self.account_id].withdraw(int(value)):
+            self.atm.dispense(int(value))
 
 
     def do_deposit(self, arg):
@@ -50,13 +72,25 @@ class MyPrompt(Cmd):
 
         if not self.account_id:
             print("Authentication required")
+            return
 
-        self.atm.accept(int(arg))
+        arg = arg.split()
 
-        self.account_list[self.account_id].deposit(int(arg))
+        if len(arg) != 1:
+            print(f"deposit requires exactly 1 argument, {len(arg)} were given")
+            return
+
+        try:
+            value = int(arg[0])
+        except ValueError:
+            print(f"withdraw requires numeric arguments")
+            return
+
+        self.atm.accept(int(value))
+        self.account_list[self.account_id].deposit(int(value))
 
 
-    def do_balance(self, subcommand):
+    def do_balance(self, arg):
         '''Returns the account’s current balance.'''
 
         if not self.account_id:
@@ -66,7 +100,7 @@ class MyPrompt(Cmd):
         print(self.account_list[self.account_id].balance)
 
 
-    def do_history(self, subcommand):
+    def do_history(self, arg):
         '''Returns the account’s transaction history.'''
 
         if not self.account_id:
@@ -81,12 +115,12 @@ class MyPrompt(Cmd):
         else:
             print("No history found")
 
-    def do_logout(self, subcommand):
+    def do_logout(self, arg):
         '''Deactivates the currently authenticated account.'''
 
         self.account_id = None
 
 
-    def do_end(self, subcommand):
+    def do_end(self, arg):
         '''Shuts down the server.'''
         return True
